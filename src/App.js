@@ -3,6 +3,7 @@ import './App.css';
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import React, { useState } from 'react';
 import Card from 'react-bootstrap/Card';
+import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import { Route, BrowserRouter, Link, Router } from "react-router-dom";
 
@@ -131,7 +132,6 @@ function epochToJsDate(ts) {
 }
 
 function getQueryWeather(queryReq, type = 'summary', key) {
-
   let query;
 
   if (typeof (queryReq) === 'string') {
@@ -143,7 +143,6 @@ function getQueryWeather(queryReq, type = 'summary', key) {
   } else {
     query = `https://api.openweathermap.org/data/2.5/weather?q=${'new york'}&appid=${key}&units=metric`
   }
-
 
   return new Promise((resolve, reject) => {
     let data = getAPIdata(encodeURI(query));
@@ -192,7 +191,7 @@ function getQueryWeather(queryReq, type = 'summary', key) {
         details = {
           humidity: data.current.humidity,
           temperature: data.current.temp,
-          wind_speed: data.current.speed,
+          wind_speed: data.current.wind_speed,
         }
         description = data.current.weather[0].description;
       }
@@ -228,14 +227,41 @@ function getQueryWeather(queryReq, type = 'summary', key) {
 class SummaryComponent extends React.Component {
   constructor(props) {
     super(props)
-    this.state = { weatherData: null }
+    this.state = { weatherData: null, inputState: '' }
   }
 
   async componentDidMount() {
-    const weatherData = await getQueryWeather('accra', 'summary', API_KEY)
+    let weatherData
+
+    if (localStorage.getItem('currentWeatherData')) {
+      let currentWeatherData = JSON.parse(localStorage.getItem('currentWeatherData'));
+      console.log(currentWeatherData);
+
+      weatherData = await getQueryWeather(currentWeatherData, 'summary', API_KEY);
+      console.log("In summary component currentweather Data");
+
+    } else {
+      weatherData = await getQueryWeather('accra', 'summary', API_KEY)
+      console.log("In summary component false of that");
+    }
 
     this.setState({
       weatherData: weatherData
+    })
+
+  }
+
+  handleTextChange(e) {
+    this.setState({
+      inputState: e.target.value
+    })
+  }
+
+  async searchCityData(e) {
+    e.preventDefault();
+    let data = await getQueryWeather(this.state.inputState, 'summary', API_KEY);
+    this.setState({
+      weatherData: data
     })
   }
 
@@ -244,29 +270,42 @@ class SummaryComponent extends React.Component {
     const weatherData = this.state.weatherData;
 
     return (
-      <div className="card mt-5">
-        <div className="card-body">
-          {(weatherData === null)
-            ? "Loading"
-            :
-            <div>
-              <p className="text-center font-weight-bolder">{weatherData.location}</p>
-              <p>{weatherData.time.toString()}</p>
-              <p className="capitalize text-center">{weatherData.description}</p>
+      <div>
 
-              <div className="d-flex flex-row justify-content-center">
-                <img src={getWeatherCurrentStatus(weatherData.description).cardImage} width="315" />
+        <div className="d-flex flex-row justify-content-center mt-2">
+          <Form style={{ width: "30vw" }}>
+            <Form.Label>Enter Location Name</Form.Label>
+            <Form.Control type="text" onChange={this.handleTextChange.bind(this)} placeholder="Enter city, or country name" />
+            <Form.Control type="submit" onClick={this.searchCityData.bind(this)} value="Submit" />
+          </Form>
+        </div>
+
+        <p className="text-center">Showing results for {(weatherData !== null) ? weatherData.location : "Loading"}</p>
+
+        <div className="card mt-2">
+          <div className="card-body">
+            {(weatherData === null)
+              ? "Loading"
+              :
+              <div>
+                <p className="text-center font-weight-bolder">{weatherData.location}</p>
+                <p>{weatherData.time.toString()}</p>
+                <p className="capitalize text-center">{weatherData.description}</p>
+
+                <div className="d-flex flex-row justify-content-center">
+                  <img src={getWeatherCurrentStatus(weatherData.description).cardImage} width="315" />
+                </div>
+
+                <div className="d-flex flex-row justify-content-around">
+                  <span>Humidity: {weatherData.details.humidity}%</span>
+                  <span>Temperature: {weatherData.details.temperature} °C</span>
+                  <span>Wind Speed: {weatherData.details.wind_speed} km/hr</span>
+                </div>
               </div>
-
-              <div className="d-flex flex-row justify-content-around">
-                <span>Humidity: {weatherData.details.humidity}%</span>
-                <span>Temperature: {weatherData.details.temperature} °C</span>
-                <span>Wind Speed: {weatherData.details.wind_speed} km/hr</span>
-              </div>
-            </div>
-          }
+            }
 
 
+          </div>
         </div>
       </div>
     )
@@ -276,7 +315,6 @@ class SummaryComponent extends React.Component {
 
 
 function WeatherCard(props) {
-  console.log(props.data);
 
   return (
     <div style={{ width: "280px" }} className="card m-4">
@@ -302,6 +340,7 @@ class ForcastComponent extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
+      locationName: "No Name", 
       weatherData: [
         {
           location: "Loading...",
@@ -321,6 +360,12 @@ class ForcastComponent extends React.Component {
     if (localStorage.getItem("currentWeatherData")) {
       let queryData = localStorage.getItem("currentWeatherData");
       queryData = JSON.parse(queryData);
+
+      this.setState({
+        locationName: queryData.location_name
+      })
+
+      console.log("In forecast component");
       weatherData = await getQueryWeather(queryData, this.props.type, API_KEY);
       let wData = [];
 
@@ -329,20 +374,20 @@ class ForcastComponent extends React.Component {
       weatherData.forEach(value => {
         let title;
         let temperature;
-        if (this.props.type == 'weekly') {
+        if (this.props.type === 'weekly') {
           let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
           title = (epochToJsDate(value.dt).getDay() >= 6) ? days[0] : days[epochToJsDate(value.dt).getDay() + 1]
           temperature = value.temp.max;
         }
 
-        if (this.props.type == 'hourly') {
+        if (this.props.type === 'hourly') {
           if (epochToJsDate(value.dt).getHours() > 12) {
             title = epochToJsDate(value.dt).getHours() - 12;
             title += " pm";
           } else {
-            title = (epochToJsDate(value.dt).getHours() == 0) ? 12 : epochToJsDate(value.dt).getHours()
+            title = (epochToJsDate(value.dt).getHours() === 0) ? 12 : epochToJsDate(value.dt).getHours()
 
-            if (epochToJsDate(value.dt).getHours() == 12) {
+            if (epochToJsDate(value.dt).getHours() === 12) {
               title += " pm";
             } else {
               title += " am";
@@ -350,6 +395,7 @@ class ForcastComponent extends React.Component {
           }
           temperature = value.temp;
         }
+        
 
         const weatherDetails = {
           location: "No location",
@@ -375,13 +421,17 @@ class ForcastComponent extends React.Component {
   render() {
     // computation goes here
     return (
-      <div className="d-flex flex-row justify-content-center flex-wrap">
-        {
-          this.state.weatherData.map((data, index) =>
-            <WeatherCard key={`weatherCard${index}`} data={data} />
-          )
-        }
+      <div>
+        <p className="text-center my-2">Showing {this.props.type} data for  {(this.state.locationName !== null) ? this.state.locationName : "Loading"}</p>
+        <div className="d-flex flex-row justify-content-center flex-wrap">
+          {
+            this.state.weatherData.map((data, index) =>
+              <WeatherCard key={`weatherCard${index}`} data={data} />
+            )
+          }
+        </div>
       </div>
+
     )
   }
 
@@ -393,9 +443,11 @@ class App extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      inputState: ''
+      weatherData: null
     }
   }
+
+
 
   render() {
     return (
@@ -410,10 +462,6 @@ class App extends React.Component {
 
               <Link to="/hourly"><Button color="twitter" active="false">Hourly</Button></Link>
             </div>
-          </div>
-
-          <div>
-
           </div>
 
           <div className="d-flex flex-row justify-content-center">
