@@ -272,7 +272,7 @@ class SummaryComponent extends React.Component {
 
     return (
       <div>
-        
+
         <div className="d-flex flex-row justify-content-center mt-2">
           <Form style={{ width: "30vw" }}>
             <Form.Label>Enter Location Name</Form.Label>
@@ -332,7 +332,11 @@ function WeatherCard(props) {
         </div>
 
 
-        <div className="weather-details text-center" style={{fontSize:"0.75rem"}}><span><i className="fa fa-cloud" aria-hidden="true"></i> Humidity: {props.data.details.humidity}%</span> <span><i className="fa fa-thermometer-half" aria-hidden="true"></i> Temperature: {props.data.details.temperature} °C</span> <span><i className="fa fa-tachometer" aria-hidden="true"></i> Wind Speed: {props.data.details.wind_speed} km/hour.</span></div>
+        <div className="weather-details text-center text-secondary d-flex flex-row justify-content-between mx-4" style={{ fontSize: "0.85rem" }}>
+          <div><i className="fa fa-cloud" aria-hidden="true"></i> <span> {props.data.details.humidity}%</span></div>
+          <div><i className="fa fa-thermometer-half" aria-hidden="true"></i><span> {props.data.details.temperature} °C </span></div>
+          <div><i className="fa fa-tachometer" aria-hidden="true"></i><span> {props.data.details.wind_speed} km/hr </span></div>
+        </div>
       </div>
     </div>
   )
