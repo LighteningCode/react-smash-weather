@@ -297,17 +297,39 @@ class SummaryComponent extends React.Component {
                   <img src={getWeatherCurrentStatus(weatherData.description).cardImage} width="315" />
                 </div>
 
-                <div className="d-flex flex-row justify-content-around">
-                  <span>Humidity: {weatherData.details.humidity}%</span>
-                  <span>Temperature: {weatherData.details.temperature} °C</span>
-                  <span>Wind Speed: {weatherData.details.wind_speed} km/hr</span>
+                <div className="d-flex flex-row justify-content-around text-dark">
+                  <div className="d-flex flex-column"><i className="fa fa-cloud align-self-center" aria-hidden="true"></i> <span>Humidity: {weatherData.details.humidity}%</span></div>
+                  <div className="d-flex flex-column"><i className="fa fa-thermometer-half align-self-center" aria-hidden="true"></i> <span>Temperature: {weatherData.details.temperature} °C</span></div>
+                  <div className="d-flex flex-column"><i className="fa fa-tachometer align-self-center" aria-hidden="true"></i> <span>Wind Speed: {weatherData.details.wind_speed} km/hr</span></div>
                 </div>
               </div>
             }
-
-
+            <div className="d-flex flex-row justify-content-center mt-3"><button className="btn btn-outline-warning btn-block text-dark"><i class="fa fa-save" aria-hidden="true"></i> Save</button></div>
           </div>
         </div>
+
+        <div className="mt-3">
+          <h4 className="text-center">Saved Forecasts</h4>
+
+          <div className="card">
+            <div className="card-body p-1">
+              <div className="d-flex flex-row">
+
+                <div className="mr-1">
+                  <img src={getWeatherCurrentStatus('snow').cardImage} width="60" />
+                </div>
+
+                <div className="d-flex flex-column justify-content-around">
+                  <div>Location</div>
+                  <div>Forcast</div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+          
+        </div>
+
       </div>
     )
   }
