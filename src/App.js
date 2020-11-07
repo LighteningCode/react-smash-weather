@@ -1,6 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
+import '../node_modules/font-awesome/css/font-awesome.min.css'
 import React, { useState } from 'react';
 import Card from 'react-bootstrap/Card';
 import Form from 'react-bootstrap/Form';
@@ -271,7 +272,7 @@ class SummaryComponent extends React.Component {
 
     return (
       <div>
-
+        
         <div className="d-flex flex-row justify-content-center mt-2">
           <Form style={{ width: "30vw" }}>
             <Form.Label>Enter Location Name</Form.Label>
@@ -317,20 +318,21 @@ class SummaryComponent extends React.Component {
 function WeatherCard(props) {
 
   return (
-    <div style={{ width: "280px" }} className="card m-4">
-      <div className="card-header d-flex flex-row justify-content-center">
-        <span style={{ fontSize: "1.3rem" }} className={`badge badge-pill text-center capitalize ${getWeatherCurrentStatus(props.data.description).bootstrapClass}`}>{getWeatherCurrentStatus(props.data.description).eventPossibilityClass}</span>
-      </div>
+    <div style={{ width: "280px" }} className="weatherCard card m-2">
 
-      <div className="card-body">
-        <h3 className="weather-title text-center">{props.data.title}</h3>
-        <p className="weather-description text-center">{props.data.description}</p>
+      <div className="card-body p-2">
+        <div className="d-flex flex-row justify-content-center">
+          <span style={{ fontSize: "1.3rem", width: "80%" }} className={`badge badge-pill text-center capitalize ${getWeatherCurrentStatus(props.data.description).bootstrapClass}`}>{getWeatherCurrentStatus(props.data.description).eventPossibilityClass}</span>
+        </div>
+
+        <h4 className="weather-title text-center">{props.data.title}</h4>
+        <p className="weather-description text-center mb-0 capitalize">{props.data.description}</p>
         <div className="d-flex flex-row justify-content-center">
           <img className="iconImg" src={getWeatherCurrentStatus(props.data.description).cardImage} width="200" alt={props.data.description} />
         </div>
 
 
-        <div className="weather-details text-center"><span>Humidity: {props.data.details.humidity}%</span> <span>Temperature: {props.data.details.temperature} °C</span> <span>Wind Speed: {props.data.details.wind_speed} km/hour.</span></div>
+        <div className="weather-details text-center" style={{fontSize:"0.75rem"}}><span><i className="fa fa-cloud" aria-hidden="true"></i> Humidity: {props.data.details.humidity}%</span> <span><i className="fa fa-thermometer-half" aria-hidden="true"></i> Temperature: {props.data.details.temperature} °C</span> <span><i className="fa fa-tachometer" aria-hidden="true"></i> Wind Speed: {props.data.details.wind_speed} km/hour.</span></div>
       </div>
     </div>
   )
@@ -340,7 +342,7 @@ class ForcastComponent extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      locationName: "No Name", 
+      locationName: "No Name",
       weatherData: [
         {
           location: "Loading...",
@@ -365,7 +367,6 @@ class ForcastComponent extends React.Component {
         locationName: queryData.location_name
       })
 
-      console.log("In forecast component");
       weatherData = await getQueryWeather(queryData, this.props.type, API_KEY);
       let wData = [];
 
@@ -395,7 +396,7 @@ class ForcastComponent extends React.Component {
           }
           temperature = value.temp;
         }
-        
+
 
         const weatherDetails = {
           location: "No location",
