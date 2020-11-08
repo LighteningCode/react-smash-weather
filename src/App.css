@@ -3,7 +3,11 @@
   text-transform: capitalize;
 }
 
-
+.ellipse{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 .weatherCard{
   transition-duration: 0.5s;

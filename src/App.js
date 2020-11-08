@@ -224,7 +224,7 @@ function getQueryWeather(queryReq, type = 'summary', key) {
 
 function SavedWeatherCard(props) {
   return (
-    <div style={{ width: "200px" }} className="card mx-1">
+    <div style={{ width: "220px" }} className="card mx-1">
       <div className="card-body p-1">
         <div className="d-flex flex-row">
 
@@ -232,9 +232,13 @@ function SavedWeatherCard(props) {
             <img src={getWeatherCurrentStatus(props.Weatherdata.description).cardImage} width="60" />
           </div>
 
-          <div className="d-flex flex-column justify-content-center">
-            <address className="font-weight-bold mb-0 text-truncate">{props.Weatherdata.location}</address>
+          <div style={{flex:"1",minWidth: "0"}} className="d-flex flex-column justify-content-center">
+            <p style={{width:"100%"}} className="font-weight-bold mb-0 ellipse">{props.Weatherdata.location}</p>
             <span className="capitalize" style={{ fontSize: "12px" }}>{props.Weatherdata.description}</span>
+          </div>
+
+          <div>
+           <button className="btn btn-outline-danger py-1 px-2"><i className="fa fa-trash" aria-hidden="true"></i></button>
           </div>
 
         </div>
@@ -266,7 +270,7 @@ class SummaryComponent extends React.Component {
       console.log("In summary component false of that");
     }
 
-    savedWeather = await this.loadWeatherData();    
+    savedWeather = await this.loadWeatherData();
 
     this.setState({
       weatherData: weatherData,
