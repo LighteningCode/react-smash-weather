@@ -222,17 +222,37 @@ function getQueryWeather(queryReq, type = 'summary', key) {
 
 }
 
+function SavedWeatherCard(props) {
+  return (
+    <div style={{ width: "200px" }} className="card mx-1">
+      <div className="card-body p-1">
+        <div className="d-flex flex-row">
 
+          <div className="mr-1">
+            <img src={getWeatherCurrentStatus(props.Weatherdata.description).cardImage} width="60" />
+          </div>
+
+          <div className="d-flex flex-column justify-content-center">
+            <address className="font-weight-bold mb-0 text-truncate">{props.Weatherdata.location}</address>
+            <span className="capitalize" style={{ fontSize: "12px" }}>{props.Weatherdata.description}</span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+}
 
 
 class SummaryComponent extends React.Component {
   constructor(props) {
     super(props)
-    this.state = { weatherData: null, inputState: '' }
+    this.state = { weatherData: null, inputState: '', savedWeatherData: [] }
   }
 
   async componentDidMount() {
-    let weatherData
+    let weatherData;
+    let savedWeather;
 
     if (localStorage.getItem('currentWeatherData')) {
       let currentWeatherData = JSON.parse(localStorage.getItem('currentWeatherData'));
@@ -246,8 +266,11 @@ class SummaryComponent extends React.Component {
       console.log("In summary component false of that");
     }
 
+    savedWeather = await this.loadWeatherData();    
+
     this.setState({
-      weatherData: weatherData
+      weatherData: weatherData,
+      savedWeatherData: savedWeather
     })
 
   }
@@ -256,6 +279,42 @@ class SummaryComponent extends React.Component {
     this.setState({
       inputState: e.target.value
     })
+  }
+
+  async saveWeatherData(e) {
+    e.preventDefault();
+    let savedWeatherData = [];
+
+    if (localStorage.getItem('savedWeatherData')) {
+      let allSavedWeatherData = JSON.parse(localStorage.getItem('savedWeatherData'));
+      allSavedWeatherData.forEach(weather => {
+        savedWeatherData.push(weather)
+      });
+    }
+
+    savedWeatherData.push(this.state.weatherData);
+
+    this.setState({
+      savedWeatherData: savedWeatherData
+    })
+
+    localStorage.setItem('savedWeatherData', JSON.stringify(savedWeatherData));
+
+    console.log("New Weather Data is saved");
+
+  }
+
+  async loadWeatherData() {
+    let savedWeatherData = [];
+
+    if (localStorage.getItem('savedWeatherData')) {
+      let allSavedWeatherData = JSON.parse(localStorage.getItem('savedWeatherData'));
+      allSavedWeatherData.forEach(weather => {
+        savedWeatherData.push(weather)
+      });
+    }
+
+    return savedWeatherData;
   }
 
   async searchCityData(e) {
@@ -267,11 +326,12 @@ class SummaryComponent extends React.Component {
   }
 
   render() {
-
+    const _savedWeather = this.state.savedWeatherData;
+    const countSavedWeather = _savedWeather.length;
     const weatherData = this.state.weatherData;
 
     return (
-      <div>
+      <div style={{ width: "80vw" }}>
 
         <div className="d-flex flex-row justify-content-center mt-2">
           <Form style={{ width: "30vw" }}>
@@ -290,7 +350,7 @@ class SummaryComponent extends React.Component {
               :
               <div>
                 <p className="text-center font-weight-bolder">{weatherData.location}</p>
-                <p>{weatherData.time.toString()}</p>
+                <p className="text-center">{weatherData.time.toString()}</p>
                 <p className="capitalize text-center">{weatherData.description}</p>
 
                 <div className="d-flex flex-row justify-content-center">
@@ -304,30 +364,24 @@ class SummaryComponent extends React.Component {
                 </div>
               </div>
             }
-            <div className="d-flex flex-row justify-content-center mt-3"><button className="btn btn-outline-warning btn-block text-dark"><i class="fa fa-save" aria-hidden="true"></i> Save</button></div>
+            <div className="d-flex flex-row justify-content-center mt-3"><button onClick={this.saveWeatherData.bind(this)} className="btn btn-outline-warning btn-block text-dark"><i class="fa fa-save" aria-hidden="true"></i> Save</button></div>
           </div>
         </div>
 
         <div className="mt-3">
           <h4 className="text-center">Saved Forecasts</h4>
 
-          <div className="card">
-            <div className="card-body p-1">
-              <div className="d-flex flex-row">
+          <div className="d-flex flex-row justify-content-center">
+            {
+              (countSavedWeather > 0)
+                ? _savedWeather.map((data, index) =>
+                  <SavedWeatherCard key={`savedW${index}`} Weatherdata={data} />
+                )
+                : <p>No weather has been saved</p>
+            }
 
-                <div className="mr-1">
-                  <img src={getWeatherCurrentStatus('snow').cardImage} width="60" />
-                </div>
 
-                <div className="d-flex flex-column justify-content-around">
-                  <div>Location</div>
-                  <div>Forcast</div>
-                </div>
-
-              </div>
-            </div>
           </div>
-          
         </div>
 
       </div>
