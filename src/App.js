@@ -238,7 +238,7 @@ function SavedWeatherCard(props) {
           </div>
 
           <div>
-           <button className="btn btn-outline-danger py-1 px-2"><i className="fa fa-trash" aria-hidden="true"></i></button>
+           <button onClick={() => props.handleDelete()} className="btn btn-outline-danger py-1 px-2"><i className="fa fa-trash" aria-hidden="true"></i></button>
           </div>
 
         </div>
@@ -306,6 +306,24 @@ class SummaryComponent extends React.Component {
 
     console.log("New Weather Data is saved");
 
+  }
+
+  deleteSavedWeather(e){
+    let newSavedWeatherData = []
+    let savedWeatherData = this.state.savedWeatherData;
+
+    for (let i = 0; i < savedWeatherData.length; i++) {
+      if (e == i) {
+        continue;
+      }
+      newSavedWeatherData.push(savedWeatherData[i])
+    }
+
+    localStorage.setItem('savedWeatherData',JSON.stringify(newSavedWeatherData))
+
+    this.setState({
+      savedWeatherData: newSavedWeatherData
+    })
   }
 
   async loadWeatherData() {
@@ -379,7 +397,7 @@ class SummaryComponent extends React.Component {
             {
               (countSavedWeather > 0)
                 ? _savedWeather.map((data, index) =>
-                  <SavedWeatherCard key={`savedW${index}`} Weatherdata={data} />
+                  <SavedWeatherCard key={`savedW${index}`} handleDelete={this.deleteSavedWeather.bind(this,index)} Weatherdata={data} />
                 )
                 : <p>No weather has been saved</p>
             }
