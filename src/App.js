@@ -224,7 +224,7 @@ function getQueryWeather(queryReq, type = 'summary', key) {
 
 function SavedWeatherCard(props) {
   return (
-    <div style={{ width: "220px" }} className="card mx-1">
+    <div onClick={()=> props.handleClick()} style={{ width: "220px" }} className="card mx-1 my-1">
       <div className="card-body p-1">
         <div className="d-flex flex-row">
 
@@ -326,6 +326,12 @@ class SummaryComponent extends React.Component {
     })
   }
 
+  switchWeatherData(e){
+    this.setState({
+      weatherData: this.state.savedWeatherData[e]
+    })
+  }
+
   async loadWeatherData() {
     let savedWeatherData = [];
 
@@ -393,11 +399,11 @@ class SummaryComponent extends React.Component {
         <div className="mt-3">
           <h4 className="text-center">Saved Forecasts</h4>
 
-          <div className="d-flex flex-row justify-content-center">
+          <div className="d-flex flex-row justify-content-center flex-wrap">
             {
               (countSavedWeather > 0)
                 ? _savedWeather.map((data, index) =>
-                  <SavedWeatherCard key={`savedW${index}`} handleDelete={this.deleteSavedWeather.bind(this,index)} Weatherdata={data} />
+                  <SavedWeatherCard key={`savedW${index}`} handleClick={this.switchWeatherData.bind(this,index)} handleDelete={this.deleteSavedWeather.bind(this,index)} Weatherdata={data} />
                 )
                 : <p>No weather has been saved</p>
             }
