@@ -224,7 +224,7 @@ function getQueryWeather(queryReq, type = 'summary', key) {
 
 function SavedWeatherCard(props) {
   return (
-    <div onClick={()=> props.handleClick()} style={{ width: "220px" }} className="card mx-1 my-1">
+    <div onClick={() => props.handleClick()} style={{ width: "220px" }} className="card mx-1 my-1">
       <div className="card-body p-1">
         <div className="d-flex flex-row">
 
@@ -232,13 +232,13 @@ function SavedWeatherCard(props) {
             <img src={getWeatherCurrentStatus(props.Weatherdata.description).cardImage} width="60" />
           </div>
 
-          <div style={{flex:"1",minWidth: "0"}} className="d-flex flex-column justify-content-center">
-            <p style={{width:"100%"}} className="font-weight-bold mb-0 ellipse">{props.Weatherdata.location}</p>
+          <div style={{ flex: "1", minWidth: "0" }} className="d-flex flex-column justify-content-center">
+            <p style={{ width: "100%" }} className="font-weight-bold mb-0 ellipse">{props.Weatherdata.location}</p>
             <span className="capitalize" style={{ fontSize: "12px" }}>{props.Weatherdata.description}</span>
           </div>
 
           <div>
-           <button onClick={() => props.handleDelete()} className="btn btn-outline-danger py-1 px-2"><i className="fa fa-trash" aria-hidden="true"></i></button>
+            <button onClick={() => props.handleDelete()} className="btn btn-outline-danger py-1 px-2"><i className="fa fa-trash" aria-hidden="true"></i></button>
           </div>
 
         </div>
@@ -247,7 +247,7 @@ function SavedWeatherCard(props) {
   );
 }
 
-
+// NOTE: Summary component
 class SummaryComponent extends React.Component {
   constructor(props) {
     super(props)
@@ -308,7 +308,7 @@ class SummaryComponent extends React.Component {
 
   }
 
-  deleteSavedWeather(e){
+  deleteSavedWeather(e) {
     let newSavedWeatherData = []
     let savedWeatherData = this.state.savedWeatherData;
 
@@ -319,14 +319,14 @@ class SummaryComponent extends React.Component {
       newSavedWeatherData.push(savedWeatherData[i])
     }
 
-    localStorage.setItem('savedWeatherData',JSON.stringify(newSavedWeatherData))
+    localStorage.setItem('savedWeatherData', JSON.stringify(newSavedWeatherData))
 
     this.setState({
       savedWeatherData: newSavedWeatherData
     })
   }
 
-  switchWeatherData(e){
+  switchWeatherData(e) {
     this.setState({
       weatherData: this.state.savedWeatherData[e]
     })
@@ -374,7 +374,18 @@ class SummaryComponent extends React.Component {
         <div className="card mt-2">
           <div className="card-body">
             {(weatherData === null)
-              ? "Loading"
+              ?
+              <div className="shimmerWrapper d-flex flex-column">
+                <div className="align-self-center shimmer-text br shimmer-animate" style={{ width: "20%" }}></div>
+                <div className="align-self-center shimmer-text br shimmer-animate" style={{ width: "30%" }}></div>
+                <div className="align-self-center shimmer-image br shimmer-animate" style={{ width: "315px", height: "315px" }}></div>
+                <div className="d-flex flex-row justify-content-around">
+                  <div className="align-self-center shimmer-text br shimmer-animate" style={{ width: "20%" }}></div>
+                  <div className="align-self-center shimmer-text br shimmer-animate" style={{ width: "20%" }}></div>
+                  <div className="align-self-center shimmer-text br shimmer-animate" style={{ width: "20%" }}></div>
+                </div>
+
+              </div>
               :
               <div>
                 <p className="text-center font-weight-bolder">{weatherData.location}</p>
@@ -390,9 +401,10 @@ class SummaryComponent extends React.Component {
                   <div className="d-flex flex-column"><i className="fa fa-thermometer-half align-self-center" aria-hidden="true"></i> <span>Temperature: {weatherData.details.temperature} °C</span></div>
                   <div className="d-flex flex-column"><i className="fa fa-tachometer align-self-center" aria-hidden="true"></i> <span>Wind Speed: {weatherData.details.wind_speed} km/hr</span></div>
                 </div>
+                <div className="d-flex flex-row justify-content-center mt-3"><button onClick={this.saveWeatherData.bind(this)} className="btn btn-outline-warning btn-block text-dark"><i class="fa fa-save" aria-hidden="true"></i> Save</button></div>
               </div>
             }
-            <div className="d-flex flex-row justify-content-center mt-3"><button onClick={this.saveWeatherData.bind(this)} className="btn btn-outline-warning btn-block text-dark"><i class="fa fa-save" aria-hidden="true"></i> Save</button></div>
+
           </div>
         </div>
 
@@ -403,7 +415,7 @@ class SummaryComponent extends React.Component {
             {
               (countSavedWeather > 0)
                 ? _savedWeather.map((data, index) =>
-                  <SavedWeatherCard key={`savedW${index}`} handleClick={this.switchWeatherData.bind(this,index)} handleDelete={this.deleteSavedWeather.bind(this,index)} Weatherdata={data} />
+                  <SavedWeatherCard key={`savedW${index}`} handleClick={this.switchWeatherData.bind(this, index)} handleDelete={this.deleteSavedWeather.bind(this, index)} Weatherdata={data} />
                 )
                 : <p>No weather has been saved</p>
             }

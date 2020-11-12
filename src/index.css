@@ -11,3 +11,46 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.shimmer-text{
+  height: 10px;
+  background: #777;
+  margin-top: 20px;
+}
+
+.br {
+  border-radius: 8px;  
+}
+
+.shimmer-image{
+  height: 65px;
+  width: 65px;
+  margin-top: 20px;
+  border-radius: 10%;
+}
+
+.shimmer-animate {
+  animation : shimmer 2s infinite;
+  background: linear-gradient(to right, #eff1f3 4%, #e2e2e2 25%, #eff1f3 36%);
+  background-size: 1000px 100%;
+}
+
+.shimmerWrapper {
+  width: 0px;
+  animation: fullView 0.5s forwards linear;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes fullView {
+  100% {
+    width: 100%;
+  }
+}
