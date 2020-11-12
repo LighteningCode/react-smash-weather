@@ -434,27 +434,54 @@ class SummaryComponent extends React.Component {
 function WeatherCard(props) {
 
   return (
-    <div style={{ width: "280px" }} className="weatherCard card m-2">
+    (!props.data.description)
+      ?
+      <div style={{ width: "280px" }} className="weatherCard card m-2">
 
-      <div className="card-body p-2">
-        <div className="d-flex flex-row justify-content-center">
-          <span style={{ fontSize: "1.3rem", width: "80%" }} className={`badge badge-pill text-center capitalize ${getWeatherCurrentStatus(props.data.description).bootstrapClass}`}>{getWeatherCurrentStatus(props.data.description).eventPossibilityClass}</span>
+        <div className="shimmerWrapper">
+          <div className="card-body p-2">
+            <div className="d-flex flex-column justify-content-center">
+              <div className="align-self-center shimmer-text br shimmer-animate" style={{ width: "30%" }}></div>
+              <div className="align-self-center shimmer-text br shimmer-animate" style={{ width: "40%" }}></div>
+              <div className="align-self-center shimmer-text br shimmer-animate" style={{ width: "20%" }}></div>
+            </div>
+
+            <div className="d-flex flex-row justify-content-center">
+              <div className="align-self-center shimmer-image br shimmer-animate" style={{ width: "120px", height: "120px" }}></div>
+            </div>
+
+
+            <div className="weather-details text-center text-secondary d-flex flex-row justify-content-between mx-4" style={{ fontSize: "0.85rem" }}>
+              <div className="align-self-center shimmer-text br shimmer-animate" style={{ width: "20%" }}></div>
+              <div className="align-self-center shimmer-text br shimmer-animate" style={{ width: "20%" }}></div>
+              <div className="align-self-center shimmer-text br shimmer-animate" style={{ width: "20%" }}></div>
+            </div>
+          </div>
         </div>
 
-        <h4 className="weather-title text-center">{props.data.title}</h4>
-        <p className="weather-description text-center mb-0 capitalize">{props.data.description}</p>
-        <div className="d-flex flex-row justify-content-center">
-          <img className="iconImg" src={getWeatherCurrentStatus(props.data.description).cardImage} width="200" alt={props.data.description} />
-        </div>
+      </div>
+      :
+      <div style={{ width: "280px" }} className="weatherCard card m-2">
+
+        <div className="card-body p-2">
+          <div className="d-flex flex-row justify-content-center">
+            <span style={{ fontSize: "1.3rem", width: "80%" }} className={`badge badge-pill text-center capitalize ${getWeatherCurrentStatus(props.data.description).bootstrapClass}`}>{getWeatherCurrentStatus(props.data.description).eventPossibilityClass}</span>
+          </div>
+
+          <h4 className="weather-title text-center">{props.data.title}</h4>
+          <p className="weather-description text-center mb-0 capitalize">{props.data.description}</p>
+          <div className="d-flex flex-row justify-content-center">
+            <img className="iconImg" src={getWeatherCurrentStatus(props.data.description).cardImage} width="200" alt={props.data.description} />
+          </div>
 
 
-        <div className="weather-details text-center text-secondary d-flex flex-row justify-content-between mx-4" style={{ fontSize: "0.85rem" }}>
-          <div><i className="fa fa-cloud" aria-hidden="true"></i> <span> {props.data.details.humidity}%</span></div>
-          <div><i className="fa fa-thermometer-half" aria-hidden="true"></i><span> {props.data.details.temperature} °C </span></div>
-          <div><i className="fa fa-tachometer" aria-hidden="true"></i><span> {props.data.details.wind_speed} km/hr </span></div>
+          <div className="weather-details text-center text-secondary d-flex flex-row justify-content-between mx-4" style={{ fontSize: "0.85rem" }}>
+            <div><i className="fa fa-cloud" aria-hidden="true"></i> <span> {props.data.details.humidity}%</span></div>
+            <div><i className="fa fa-thermometer-half" aria-hidden="true"></i><span> {props.data.details.temperature} °C </span></div>
+            <div><i className="fa fa-tachometer" aria-hidden="true"></i><span> {props.data.details.wind_speed} km/hr </span></div>
+          </div>
         </div>
       </div>
-    </div>
   )
 }
 
@@ -469,7 +496,7 @@ class ForcastComponent extends React.Component {
           title: "Loading...",
           time: 'Loading...',
           status: 'Loading...',
-          description: "Loading...",
+          description: null,
           details: { humidity: "", temperature: "", wind_speed: "" },
         }
       ]
