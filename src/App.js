@@ -4,6 +4,7 @@ import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import '../node_modules/font-awesome/css/font-awesome.min.css'
 import React, { useState } from 'react';
 import Card from 'react-bootstrap/Card';
+import Nav from 'react-bootstrap/Nav';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import { Route, BrowserRouter, Link, Router } from "react-router-dom";
@@ -224,7 +225,7 @@ function getQueryWeather(queryReq, type = 'summary', key) {
 
 function SavedWeatherCard(props) {
   return (
-    <div onClick={() => props.handleClick()} style={{ width: "220px" }} className="card mx-1 my-1">
+    <div onClick={() => props.handleClick()} style={{ width: "220px" }} className="card savedWeather mx-1 my-1">
       <div className="card-body p-1">
         <div className="d-flex flex-row">
 
@@ -362,14 +363,14 @@ class SummaryComponent extends React.Component {
       <div style={{ width: "80vw" }}>
 
         <div className="d-flex flex-row justify-content-center mt-2">
-          <Form style={{ width: "30vw" }}>
+          <Form className="formInput">
             <Form.Label>Enter Location Name</Form.Label>
             <Form.Control type="text" onChange={this.handleTextChange.bind(this)} placeholder="Enter city, or country name" />
             <Form.Control type="submit" onClick={this.searchCityData.bind(this)} value="Submit" />
           </Form>
         </div>
 
-        <p className="text-center">Showing results for {(weatherData !== null) ? weatherData.location : "Loading"}</p>
+        <p className="text-center font-weight-bold">Showing results for {(weatherData !== null) ? weatherData.location : "Loading"}</p>
 
         <div className="card mt-2">
           <div className="card-body">
@@ -401,7 +402,7 @@ class SummaryComponent extends React.Component {
                   <div className="d-flex flex-column"><i className="fa fa-thermometer-half align-self-center" aria-hidden="true"></i> <span>Temperature: {weatherData.details.temperature} °C</span></div>
                   <div className="d-flex flex-column"><i className="fa fa-tachometer align-self-center" aria-hidden="true"></i> <span>Wind Speed: {weatherData.details.wind_speed} km/hr</span></div>
                 </div>
-                <div className="d-flex flex-row justify-content-center mt-3"><button onClick={this.saveWeatherData.bind(this)} className="btn btn-outline-warning btn-block text-dark"><i class="fa fa-save" aria-hidden="true"></i> Save</button></div>
+                <div className="d-flex flex-row justify-content-center mt-3"><button onClick={this.saveWeatherData.bind(this)} className="btn btn-outline-warning btn-block text-dark"><i className="fa fa-save" aria-hidden="true"></i> Save</button></div>
               </div>
             }
 
@@ -570,7 +571,7 @@ class ForcastComponent extends React.Component {
     // computation goes here
     return (
       <div>
-        <p className="text-center my-2">Showing {this.props.type} data for  {(this.state.locationName !== null) ? this.state.locationName : "Loading"}</p>
+        <p className="text-center my-2 font-weight-bold">Showing {this.props.type} data for  {(this.state.locationName !== null) ? this.state.locationName : "Loading"}</p>
         <div className="d-flex flex-row justify-content-center flex-wrap">
           {
             this.state.weatherData.map((data, index) =>
@@ -599,16 +600,18 @@ class App extends React.Component {
 
   render() {
     return (
-      <div>
+      <div className="mt-3 mb-5">
         <BrowserRouter>
 
-          <div className="d-flex flex-row justify-content-center">
+          <div className="d-flex flex-row justify-content-center mt-2">
             <div className="d-flex flex-row justify-content-around">
-              <Link to="/"><Button color="twitter" active="false">Current</Button></Link>
 
-              <Link to="/weekly"><Button color="twitter" active="false">Weekly</Button></Link>
+              <div className="btn-group btn-group-lg" role="group">
+                  <Link to="/" className="text-white btn btn-primary">Current</Link>
+                  <Link to="/weekly" className="text-white btn btn-primary">Weekly</Link>
+                  <Link to="/hourly" className="text-white btn btn-primary">Hourly</Link>
+              </div>
 
-              <Link to="/hourly"><Button color="twitter" active="false">Hourly</Button></Link>
             </div>
           </div>
 
