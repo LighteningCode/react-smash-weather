@@ -5,7 +5,7 @@ import App from '../App';
 import SummaryComponent from '../SummaryComponent';
 import { expect } from 'chai';
 import Adapter from 'enzyme-adapter-react-16';
-
+ 
 Enzyme.configure({ adapter: new Adapter })
 
 
