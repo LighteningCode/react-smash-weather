@@ -12,7 +12,7 @@ const WEATHERICON = {
     windy: "./weatherStates/weather-windy.png",
     error: "./weatherStates/weather-error.png",
 }
-
+ 
 async function getAPIdata(url) {
     const response = await fetch(url)
     let data = response.json();
@@ -113,6 +113,7 @@ exports.getWeatherCurrentStatus = function (switchClause) {
             break;
     }
 }
+
 
 
 function epochToJsDate (ts) {

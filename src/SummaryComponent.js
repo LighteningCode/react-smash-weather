@@ -16,31 +16,69 @@ const API_KEY = '5b240d5ca7b85efd188e3bcf200f8772';
 class SummaryComponent extends React.Component {
     constructor(props) {
         super(props)
-        this.state = { weatherData: null, inputState: '', savedWeatherData: [] }
+        this.state = { weatherData: null, inputState: '', savedWeatherData: [] ,datahasLoaded:false}
     }
 
     async componentDidMount() {
         let weatherData;
         let savedWeather;
 
+        if (localStorage.getItem('weatherData')) {
+            let details;
+            let description;
+            let location;
+            let time;
+
+            let data = JSON.parse(localStorage.getItem('weatherData'));
+
+            details = {
+                humidity: data.current.humidity,
+                temperature: data.current.temp,
+                wind_speed: data.current.wind_speed,
+            }
+            description = data.current.weather[0].description;
+            location = data.timezone
+            time = epochToJsDate(data.current.dt);
+     
+            const weatherData = {
+                location: location,
+                time: time,
+                description: description,
+                details: details,
+            }
+
+            this.setState({
+                weatherData: weatherData
+            })
+        }
+
+
         if (localStorage.getItem('currentWeatherData')) {
             let currentWeatherData = JSON.parse(localStorage.getItem('currentWeatherData'));
             console.log(currentWeatherData);
 
-            weatherData = await getQueryWeather(currentWeatherData, 'summary', API_KEY);
-            console.log("In summary component currentweather Data");
+            await getQueryWeather(currentWeatherData, 'summary', API_KEY).then((data) => {
+                this.setState({
+                    weatherData: data,
+                    datahasLoaded: true
+                })
+
+            }).catch(err => {
+                console.log(err);
+            });
 
         } else {
             weatherData = await getQueryWeather('accra', 'summary', API_KEY)
             console.log("In summary component false of that");
         }
 
-        savedWeather = await this.loadWeatherData();
+        savedWeather = await this.loadWeatherData().then(data => {
+            this.setState({
+                savedWeatherData: data
+            })
+        });
 
-        this.setState({
-            weatherData: weatherData,
-            savedWeatherData: savedWeather
-        })
+
 
     }
 
