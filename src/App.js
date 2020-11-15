@@ -8,6 +8,9 @@ import Nav from 'react-bootstrap/Nav';
 import Button from 'react-bootstrap/Button';
 import { Route, BrowserRouter, Link, Router } from "react-router-dom";
 import SummaryComponent from "./SummaryComponent";
+import ReactNotification, { store } from 'react-notifications-component'
+import '../node_modules/react-notifications-component/dist/theme.css'
+import '../node_modules/animate.css';
 import './utils';
 import {
   getQueryWeather,
@@ -139,12 +142,28 @@ class ForcastComponent extends React.Component {
           description: null,
           details: { humidity: "", temperature: "", wind_speed: "" },
         }
-      ]
+      ],
+      dataHasLoaded: null
     }
   }
 
   async componentDidMount() {
     let weatherData;
+
+    if (this.props.dataHasLoaded == null) {
+      store.addNotification({
+        title: "Data Loading...",
+        message: "Weather data loading from API",
+        type: "info",
+        insert: "top",
+        container: "bottom-center",
+        animationIn: ["animate__animated", "animate__fadeIn"],
+        animationOut: ["animate__animated", "animate__fadeOut"],
+        dismiss: {
+          duration: 2000,
+        }
+      })
+    }
 
 
     if (localStorage.getItem('weatherData')) {
@@ -177,19 +196,49 @@ class ForcastComponent extends React.Component {
         locationName: queryData.location_name
       })
 
-      getQueryWeather(queryData, this.props.type, API_KEY).then(data=>{
+      getQueryWeather(queryData, this.props.type, API_KEY).then(data => {
         if (data) {
 
-          processForcastData(this.props.type, data).then(data=>{
+          processForcastData(this.props.type, data).then(data => {
             this.setState({
               weatherData: data
             })
-          }).catch(err =>{
+            store.addNotification({
+              title: "Data Loaded",
+              message: "Success!",
+              type: "success",
+              insert: "top",
+              container: "bottom-center",
+              animationIn: ["animate__animated", "animate__fadeIn"],
+              animationOut: ["animate__animated", "animate__fadeOut"],
+              dismiss: {
+                duration: 5000,
+              }
+            })
+          }).catch(err => {
             console.log(err);
           })
 
         }
-      }).catch(err => console.log(err));
+      }).catch(err => {
+
+        if (err) {
+          store.addNotification({
+            title: "Offline...",
+            message: "Seems like you are offline",
+            type: "danger",
+            insert: "top",
+            container: "bottom-center",
+            animationIn: ["animate__animated", "animate__fadeIn"],
+            animationOut: ["animate__animated", "animate__fadeOut"],
+            dismiss: {
+              duration: 0,
+            }
+          })
+        }
+
+        console.log(err)
+      });
     }
 
   }
@@ -229,6 +278,7 @@ class App extends React.Component {
   render() {
     return (
       <div className="mt-3 mb-5">
+        <ReactNotification />
         <BrowserRouter>
 
           <div className="d-flex flex-row justify-content-center mt-2">

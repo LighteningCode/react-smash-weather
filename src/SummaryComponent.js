@@ -6,22 +6,37 @@ import {
 } from './utils';
 import Form from 'react-bootstrap/Form';
 import SavedWeatherCard from './SavedWeatherCard';
+import { store } from "react-notifications-component";
 
 
 const API_KEY = '5b240d5ca7b85efd188e3bcf200f8772';
-
 
 
 // NOTE: Summary component
 class SummaryComponent extends React.Component {
     constructor(props) {
         super(props)
-        this.state = { weatherData: null, inputState: '', savedWeatherData: [] ,datahasLoaded:false}
+        this.state = { weatherData: null, inputState: '', savedWeatherData: [], dataHasLoaded: null }
     }
 
     async componentDidMount() {
         let weatherData;
         let savedWeather;
+
+        if (this.props.dataHasLoaded == null) {
+            store.addNotification({
+                title: "Data Loading...",
+                message: "Weather data loading from API",
+                type: "info",
+                insert: "top",
+                container: "bottom-center",
+                animationIn: ["animate__animated", "animate__fadeIn"],
+                animationOut: ["animate__animated", "animate__fadeOut"],
+                dismiss: {
+                    duration: 2000,
+                }
+            })
+        }
 
         if (localStorage.getItem('weatherData')) {
             let details;
@@ -39,7 +54,7 @@ class SummaryComponent extends React.Component {
             description = data.current.weather[0].description;
             location = data.timezone
             time = epochToJsDate(data.current.dt);
-     
+
             const weatherData = {
                 location: location,
                 time: time,
@@ -52,7 +67,6 @@ class SummaryComponent extends React.Component {
             })
         }
 
-
         if (localStorage.getItem('currentWeatherData')) {
             let currentWeatherData = JSON.parse(localStorage.getItem('currentWeatherData'));
             console.log(currentWeatherData);
@@ -62,8 +76,34 @@ class SummaryComponent extends React.Component {
                     weatherData: data,
                     datahasLoaded: true
                 })
-
+                store.addNotification({
+                    title: "Data Loaded",
+                    message: "Success!",
+                    type: "success",
+                    insert: "top",
+                    container: "bottom-center",
+                    animationIn: ["animate__animated", "animate__fadeIn"],
+                    animationOut: ["animate__animated", "animate__fadeOut"],
+                    dismiss: {
+                        duration: 5000,
+                    }
+                })
             }).catch(err => {
+
+                if (err) {
+                    store.addNotification({
+                        title: "Offline...",
+                        message: "Seems like you are offline",
+                        type: "danger",
+                        insert: "top",
+                        container: "bottom-center",
+                        animationIn: ["animate__animated", "animate__fadeIn"],
+                        animationOut: ["animate__animated", "animate__fadeOut"],
+                        dismiss: {
+                            duration: 0,
+                        }
+                    })
+                }
                 console.log(err);
             });
 
