@@ -73,6 +73,50 @@ function WeatherCard(props) {
   )
 }
 
+function processForcastData(forcastType,data){
+  let wData = [];
+
+  data.forEach(value => {
+    let title;
+    let temperature;
+    if (forcastType === 'weekly') {
+      let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      title = (epochToJsDate(value.dt).getDay() >= 6) ? days[0] : days[epochToJsDate(value.dt).getDay() + 1]
+      temperature = value.temp.max;
+    }
+
+    if (forcastType === 'hourly') {
+      if (epochToJsDate(value.dt).getHours() > 12) {
+        title = epochToJsDate(value.dt).getHours() - 12;
+        title += " pm";
+      } else {
+        title = (epochToJsDate(value.dt).getHours() === 0) ? 12 : epochToJsDate(value.dt).getHours()
+
+        if (epochToJsDate(value.dt).getHours() === 12) {
+          title += " pm";
+        } else {
+          title += " am";
+        }
+      }
+      temperature = value.temp;
+    }
+
+
+    const weatherDetails = {
+      location: "No location",
+      title: title,
+      time: 'time',
+      status: 'No Status',
+      description: value.weather[0].description,
+      details: { humidity: value.humidity, temperature: temperature, wind_speed: value.wind_speed },
+    }
+
+    wData.push(weatherDetails);
+  });
+
+  return wData;
+}
+
 class ForcastComponent extends React.Component {
   constructor(props) {
     super(props)
@@ -105,46 +149,8 @@ class ForcastComponent extends React.Component {
         weatherData = data.hourly;
       }
 
-      let wData = [];
-
-      weatherData.forEach(value => {
-        let title;
-        let temperature;
-        if (this.props.type === 'weekly') {
-          let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-          title = (epochToJsDate(value.dt).getDay() >= 6) ? days[0] : days[epochToJsDate(value.dt).getDay() + 1]
-          temperature = value.temp.max;
-        }
-
-        if (this.props.type === 'hourly') {
-          if (epochToJsDate(value.dt).getHours() > 12) {
-            title = epochToJsDate(value.dt).getHours() - 12;
-            title += " pm";
-          } else {
-            title = (epochToJsDate(value.dt).getHours() === 0) ? 12 : epochToJsDate(value.dt).getHours()
-
-            if (epochToJsDate(value.dt).getHours() === 12) {
-              title += " pm";
-            } else {
-              title += " am";
-            }
-          }
-          temperature = value.temp;
-        }
-
-
-        const weatherDetails = {
-          location: "No location",
-          title: title,
-          time: 'time',
-          status: 'No Status',
-          description: value.weather[0].description,
-          details: { humidity: value.humidity, temperature: temperature, wind_speed: value.wind_speed },
-        }
-
-        wData.push(weatherDetails);
-      });
-
+      let wData = processForcastData(this.props.type,weatherData)
+     
       this.setState({
         weatherData: wData
       })
@@ -160,53 +166,16 @@ class ForcastComponent extends React.Component {
       })
 
       weatherData = await getQueryWeather(queryData, this.props.type, API_KEY).catch(err => console.log(err));
-      let wData = [];
+      let wData;
 
       if (weatherData) {
-        weatherData.forEach(value => {
-          let title;
-          let temperature;
-          if (this.props.type === 'weekly') {
-            let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-            title = (epochToJsDate(value.dt).getDay() >= 6) ? days[0] : days[epochToJsDate(value.dt).getDay() + 1]
-            temperature = value.temp.max;
-          }
-  
-          if (this.props.type === 'hourly') {
-            if (epochToJsDate(value.dt).getHours() > 12) {
-              title = epochToJsDate(value.dt).getHours() - 12;
-              title += " pm";
-            } else {
-              title = (epochToJsDate(value.dt).getHours() === 0) ? 12 : epochToJsDate(value.dt).getHours()
-  
-              if (epochToJsDate(value.dt).getHours() === 12) {
-                title += " pm";
-              } else {
-                title += " am";
-              }
-            }
-            temperature = value.temp;
-          }
-  
-  
-          const weatherDetails = {
-            location: "No location",
-            title: title,
-            time: 'time',
-            status: 'No Status',
-            description: value.weather[0].description,
-            details: { humidity: value.humidity, temperature: temperature, wind_speed: value.wind_speed },
-          }
-  
-          wData.push(weatherDetails);
-        });
-  
+        wData = processForcastData(this.props.type,weatherData)
         this.setState({
           weatherData: wData
         })
       }
+      
     }
-
 
   }
 
