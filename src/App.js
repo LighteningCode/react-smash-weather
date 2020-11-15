@@ -73,48 +73,56 @@ function WeatherCard(props) {
   )
 }
 
-function processForcastData(forcastType,data){
-  let wData = [];
+function processForcastData(forcastType, data) {
 
-  data.forEach(value => {
-    let title;
-    let temperature;
-    if (forcastType === 'weekly') {
-      let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-      title = (epochToJsDate(value.dt).getDay() >= 6) ? days[0] : days[epochToJsDate(value.dt).getDay() + 1]
-      temperature = value.temp.max;
-    }
+  return new Promise((resolve, reject) => {
+    let wData = [];
 
-    if (forcastType === 'hourly') {
-      if (epochToJsDate(value.dt).getHours() > 12) {
-        title = epochToJsDate(value.dt).getHours() - 12;
-        title += " pm";
-      } else {
-        title = (epochToJsDate(value.dt).getHours() === 0) ? 12 : epochToJsDate(value.dt).getHours()
-
-        if (epochToJsDate(value.dt).getHours() === 12) {
-          title += " pm";
-        } else {
-          title += " am";
+    if (data) {
+      data.forEach(value => {
+        let title;
+        let temperature;
+        if (forcastType === 'weekly') {
+          let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+          title = (epochToJsDate(value.dt).getDay() >= 6) ? days[0] : days[epochToJsDate(value.dt).getDay() + 1]
+          temperature = value.temp.max;
         }
-      }
-      temperature = value.temp;
+
+        if (forcastType === 'hourly') {
+          if (epochToJsDate(value.dt).getHours() > 12) {
+            title = epochToJsDate(value.dt).getHours() - 12;
+            title += " pm";
+          } else {
+            title = (epochToJsDate(value.dt).getHours() === 0) ? 12 : epochToJsDate(value.dt).getHours()
+
+            if (epochToJsDate(value.dt).getHours() === 12) {
+              title += " pm";
+            } else {
+              title += " am";
+            }
+          }
+          temperature = value.temp;
+        }
+
+
+        const weatherDetails = {
+          location: "No location",
+          title: title,
+          time: 'time',
+          status: 'No Status',
+          description: value.weather[0].description,
+          details: { humidity: value.humidity, temperature: temperature, wind_speed: value.wind_speed },
+        }
+
+        wData.push(weatherDetails);
+      });
+      resolve(wData)
+    } else {
+      reject(wData)
     }
 
+  })
 
-    const weatherDetails = {
-      location: "No location",
-      title: title,
-      time: 'time',
-      status: 'No Status',
-      description: value.weather[0].description,
-      details: { humidity: value.humidity, temperature: temperature, wind_speed: value.wind_speed },
-    }
-
-    wData.push(weatherDetails);
-  });
-
-  return wData;
 }
 
 class ForcastComponent extends React.Component {
@@ -149,11 +157,15 @@ class ForcastComponent extends React.Component {
         weatherData = data.hourly;
       }
 
-      let wData = processForcastData(this.props.type,weatherData)
-     
-      this.setState({
-        weatherData: wData
+      await processForcastData(this.props.type, weatherData).then(data => {
+        this.setState({
+          weatherData: data
+        })
+      }).catch((err) => {
+        console.log("Data not able to show");
+        console.log(err);
       })
+
     }
 
 
@@ -165,16 +177,19 @@ class ForcastComponent extends React.Component {
         locationName: queryData.location_name
       })
 
-      weatherData = await getQueryWeather(queryData, this.props.type, API_KEY).catch(err => console.log(err));
-      let wData;
+      getQueryWeather(queryData, this.props.type, API_KEY).then(data=>{
+        if (data) {
 
-      if (weatherData) {
-        wData = processForcastData(this.props.type,weatherData)
-        this.setState({
-          weatherData: wData
-        })
-      }
-      
+          processForcastData(this.props.type, data).then(data=>{
+            this.setState({
+              weatherData: data
+            })
+          }).catch(err =>{
+            console.log(err);
+          })
+
+        }
+      }).catch(err => console.log(err));
     }
 
   }
