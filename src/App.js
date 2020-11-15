@@ -1,11 +1,7 @@
-import logo from './logo.svg';
 import './App.css';
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import '../node_modules/font-awesome/css/font-awesome.min.css'
 import React, { useState } from 'react';
-import Card from 'react-bootstrap/Card';
-import Nav from 'react-bootstrap/Nav';
-import Button from 'react-bootstrap/Button';
 import { Route, BrowserRouter, Link, Router } from "react-router-dom";
 import SummaryComponent from "./SummaryComponent";
 import ReactNotification, { store } from 'react-notifications-component'
