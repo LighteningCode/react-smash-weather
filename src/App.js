@@ -94,18 +94,18 @@ class ForcastComponent extends React.Component {
   async componentDidMount() {
     let weatherData;
 
-    if (localStorage.getItem("currentWeatherData")) {
-      let queryData = localStorage.getItem("currentWeatherData");
-      queryData = JSON.parse(queryData);
 
-      this.setState({
-        locationName: queryData.location_name
-      })
+    if (localStorage.getItem('weatherData')) {
+      let data = JSON.parse(localStorage.getItem('weatherData'));
 
-      weatherData = await getQueryWeather(queryData, this.props.type, API_KEY);
+      if (this.props.type === 'weekly') {
+        weatherData = data.daily;
+      }
+      if (this.props.type === 'hourly') {
+        weatherData = data.hourly;
+      }
+
       let wData = [];
-
-
 
       weatherData.forEach(value => {
         let title;
@@ -148,6 +148,63 @@ class ForcastComponent extends React.Component {
       this.setState({
         weatherData: wData
       })
+    }
+
+
+    if (localStorage.getItem("currentWeatherData")) {
+      let queryData = localStorage.getItem("currentWeatherData");
+      queryData = JSON.parse(queryData);
+
+      this.setState({
+        locationName: queryData.location_name
+      })
+
+      weatherData = await getQueryWeather(queryData, this.props.type, API_KEY).catch(err => console.log(err));
+      let wData = [];
+
+      if (weatherData) {
+        weatherData.forEach(value => {
+          let title;
+          let temperature;
+          if (this.props.type === 'weekly') {
+            let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            title = (epochToJsDate(value.dt).getDay() >= 6) ? days[0] : days[epochToJsDate(value.dt).getDay() + 1]
+            temperature = value.temp.max;
+          }
+  
+          if (this.props.type === 'hourly') {
+            if (epochToJsDate(value.dt).getHours() > 12) {
+              title = epochToJsDate(value.dt).getHours() - 12;
+              title += " pm";
+            } else {
+              title = (epochToJsDate(value.dt).getHours() === 0) ? 12 : epochToJsDate(value.dt).getHours()
+  
+              if (epochToJsDate(value.dt).getHours() === 12) {
+                title += " pm";
+              } else {
+                title += " am";
+              }
+            }
+            temperature = value.temp;
+          }
+  
+  
+          const weatherDetails = {
+            location: "No location",
+            title: title,
+            time: 'time',
+            status: 'No Status',
+            description: value.weather[0].description,
+            details: { humidity: value.humidity, temperature: temperature, wind_speed: value.wind_speed },
+          }
+  
+          wData.push(weatherDetails);
+        });
+  
+        this.setState({
+          weatherData: wData
+        })
+      }
     }
 
 
