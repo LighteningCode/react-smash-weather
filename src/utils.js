@@ -19,7 +19,8 @@ async function getAPIdata(url) {
     return data;
 }
 
-exports.getWeatherCurrentStatus = function (switchClause) {
+
+const getWeatherCurrentStatus = function (switchClause) {
     switch (switchClause) {
         case 'clear sky':
             return {
@@ -116,16 +117,15 @@ exports.getWeatherCurrentStatus = function (switchClause) {
 
 
 
-function epochToJsDate (ts) {
+const epochToJsDate = (ts) => {
     // ts = epoch timestamp
     // returns date obj 
     return new Date(ts * 1000);
 }
 
-exports.epochToJsDate = epochToJsDate
 
 
-exports.getQueryWeather = function (queryReq, type = 'summary', key) {
+const getQueryWeather = function (queryReq, type = 'summary', key) {
     let query;
 
     if (typeof (queryReq) === 'string') {
@@ -211,3 +211,5 @@ exports.getQueryWeather = function (queryReq, type = 'summary', key) {
     })
 
 }
+
+export {epochToJsDate,getQueryWeather,getWeatherCurrentStatus}

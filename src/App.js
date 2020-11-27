@@ -7,12 +7,7 @@ import SummaryComponent from "./SummaryComponent";
 import ReactNotification, { store } from 'react-notifications-component'
 import '../node_modules/react-notifications-component/dist/theme.css'
 import '../node_modules/animate.css';
-import './utils';
-import {
-  getQueryWeather,
-  getWeatherCurrentStatus,
-  epochToJsDate
-} from './utils';
+import {getQueryWeather,getWeatherCurrentStatus,epochToJsDate} from './utils';
 
 
 const API_KEY = '5b240d5ca7b85efd188e3bcf200f8772';

@@ -5,6 +5,8 @@
 /.pnp
 .pnp.js
 
+weather_server/node_modules
+
 # testing
 /coverage
 
