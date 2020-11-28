@@ -46,14 +46,22 @@ class SummaryComponent extends React.Component {
 
             let data = JSON.parse(localStorage.getItem('weatherData'));
 
+            console.log(data)
+
+            // details = {
+            //     humidity: data.current.humidity,
+            //     temperature: data.current.temp,
+            //     wind_speed: data.current.wind_speed,
+            // }
+
             details = {
-                humidity: data.current.humidity,
-                temperature: data.current.temp,
-                wind_speed: data.current.wind_speed,
+                humidity: data.main.humidity,
+                temperature: data.main.temp,
+                wind_speed: data.wind.speed,
             }
-            description = data.current.weather[0].description;
-            location = data.timezone
-            time = epochToJsDate(data.current.dt);
+            description = data.weather[0].description;
+            location = data.name;
+            time = epochToJsDate(data.dt);
 
             const weatherData = {
                 location: location,
@@ -156,7 +164,7 @@ class SummaryComponent extends React.Component {
         let savedWeatherData = this.state.savedWeatherData;
 
         for (let i = 0; i < savedWeatherData.length; i++) {
-            if (e == i) {
+            if (e === i) {
                 continue;
             }
             newSavedWeatherData.push(savedWeatherData[i])

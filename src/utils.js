@@ -156,6 +156,8 @@ const getQueryWeather = function (queryReq, type = 'summary', key) {
                     lon: data.coord.lon,
                 }
 
+                console.log("this is the query data", QueryLocationData)
+                console.log("this is the data" , data);
 
                 localStorage.setItem("weatherData", JSON.stringify(data));
                 localStorage.setItem("currentWeatherData", JSON.stringify(QueryLocationData))
