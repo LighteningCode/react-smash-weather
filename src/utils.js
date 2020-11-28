@@ -1,3 +1,4 @@
+import { store } from "react-notifications-component";
 
 const WEATHERICON = {
     clear: "./weatherStates/weather-clear.png",
@@ -126,8 +127,9 @@ const epochToJsDate = (ts) => {
 
 
 const getQueryWeather = function (queryReq, type = 'summary', key) {
-    let query;
 
+    let query;
+    
     if (typeof (queryReq) === 'string') {
         queryReq = queryReq.toLowerCase();
         query = `https://api.openweathermap.org/data/2.5/weather?q=${queryReq}&appid=${key}&units=metric`
@@ -138,16 +140,23 @@ const getQueryWeather = function (queryReq, type = 'summary', key) {
         query = `https://api.openweathermap.org/data/2.5/weather?q=${'new york'}&appid=${key}&units=metric`
     }
 
+    console.log(query)
+
     return new Promise((resolve, reject) => {
         let data = getAPIdata(encodeURI(query));
 
         data.then(function (data) {
-
+            
             // needed variables
             let location;
             let time;
             let details;
             let description;
+
+            if(data.cod === "404"){
+                reject(data);
+                throw new Error(data.message);
+            }
 
             if (!query.includes("onecall")) {
                 const QueryLocationData = {
@@ -208,6 +217,19 @@ const getQueryWeather = function (queryReq, type = 'summary', key) {
             }
 
         }).catch(function (error) {
+
+            store.addNotification({
+                title: "Error",
+                message: error.message,
+                type: "danger",
+                insert: "top",
+                container: "bottom-center",
+                animationIn: ["animate__animated", "animate__fadeIn"],
+                animationOut: ["animate__animated", "animate__fadeOut"],
+                dismiss: {
+                    duration: 3000,
+                }
+            })
             reject(error)
         })
     })

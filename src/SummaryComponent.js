@@ -46,23 +46,28 @@ class SummaryComponent extends React.Component {
 
             let data = JSON.parse(localStorage.getItem('weatherData'));
 
-            console.log(data)
-
-            // details = {
-            //     humidity: data.current.humidity,
-            //     temperature: data.current.temp,
-            //     wind_speed: data.current.wind_speed,
-            // }
-
-            details = {
-                humidity: data.main.humidity,
-                temperature: data.main.temp,
-                wind_speed: data.wind.speed,
+            if (data.base !== undefined) {
+                details = {
+                    humidity: data.main.humidity,
+                    temperature: data.main.temp,
+                    wind_speed: data.wind.speed,
+                }
+                description = data.weather[0].description;
+                location = data.name;
+                time = epochToJsDate(data.dt);
+            }else{
+                details = {
+                    humidity: data.current.humidity,
+                    temperature: data.current.temp,
+                    wind_speed: data.current.wind_speed,
+                }
+                description = data.current.weather[0].description;
+                location = data.timezone
+                time = epochToJsDate(data.current.dt);
+    
             }
-            description = data.weather[0].description;
-            location = data.name;
-            time = epochToJsDate(data.dt);
 
+          
             const weatherData = {
                 location: location,
                 time: time,
