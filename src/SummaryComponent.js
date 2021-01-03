@@ -12,31 +12,29 @@ import { store } from "react-notifications-component";
 const API_KEY = '5b240d5ca7b85efd188e3bcf200f8772';
 
 
+function checkNotificationPromise() {
+    try {
+        Notification.requestPermission().then()
+    } catch (e) {
+        return false;
+    }
+
+    return true;
+}
+
+
 // NOTE: Summary component
 class SummaryComponent extends React.Component {
     constructor(props) {
         super(props)
-        this.state = { weatherData: null, inputState: '', savedWeatherData: [], dataHasLoaded: null }
+        this.state = { weatherData: null, inputState: '', savedWeatherData: [], dataHasLoaded: null, permission: 'Default' }
+        this.requestPermission = this.requestPermission.bind(this)
+        this.showNotification = this.showNotification.bind(this)
     }
 
     async componentDidMount() {
         let weatherData;
         let savedWeather;
-
-        if (this.props.dataHasLoaded == null) {
-            store.addNotification({
-                title: "Data Loading...",
-                message: "Weather data loading from API",
-                type: "info",
-                insert: "top",
-                container: "bottom-center",
-                animationIn: ["animate__animated", "animate__fadeIn"],
-                animationOut: ["animate__animated", "animate__fadeOut"],
-                dismiss: {
-                    duration: 2000,
-                }
-            })
-        }
 
         if (localStorage.getItem('weatherData')) {
             let details;
@@ -55,7 +53,7 @@ class SummaryComponent extends React.Component {
                 description = data.weather[0].description;
                 location = data.name;
                 time = epochToJsDate(data.dt);
-            }else{
+            } else {
                 details = {
                     humidity: data.current.humidity,
                     temperature: data.current.temp,
@@ -64,10 +62,10 @@ class SummaryComponent extends React.Component {
                 description = data.current.weather[0].description;
                 location = data.timezone
                 time = epochToJsDate(data.current.dt);
-    
+
             }
 
-          
+
             const weatherData = {
                 location: location,
                 time: time,
@@ -88,18 +86,6 @@ class SummaryComponent extends React.Component {
                 this.setState({
                     weatherData: data,
                     datahasLoaded: true
-                })
-                store.addNotification({
-                    title: "Data Loaded",
-                    message: "Success!",
-                    type: "success",
-                    insert: "top",
-                    container: "bottom-center",
-                    animationIn: ["animate__animated", "animate__fadeIn"],
-                    animationOut: ["animate__animated", "animate__fadeOut"],
-                    dismiss: {
-                        duration: 5000,
-                    }
                 })
             }).catch(err => {
 
@@ -139,6 +125,35 @@ class SummaryComponent extends React.Component {
         this.setState({
             inputState: e.target.value
         })
+    }
+
+    requestPermission(e) {
+        if (!('Notification' in window)) {
+            console.log("This browser does not support notifications.")
+        } else {
+
+            if(checkNotificationPromise()){
+                Notification.requestPermission().then(permission =>{
+                    this.setState({
+                        permission: permission
+                    })
+                })
+            }else{
+                Notification.requestPermission((permission) => {
+                    this.setState({
+                        permission: permission
+                    })
+                })
+            }
+  
+        }
+    }
+
+
+    showNotification(){
+        let img = './weatherStates/weather-clear.png'
+        let text = 'Hey, you have new weather here'
+        let notification = new Notification("Smash Weather", {body:text,image:img})
     }
 
     async saveWeatherData(e) {
@@ -275,11 +290,13 @@ class SummaryComponent extends React.Component {
                                 )
                                 : <p>No weather has been saved</p>
                         }
-
-
                     </div>
                 </div>
-
+                <button onClick={this.requestPermission} className="btn btn-primary"> Request </button> <div>{this.state.permission}</div> 
+                {
+                    this.state.permission === 'granted' &&
+                    <button onClick={this.showNotification} className="btn btn-warning">Start notification</button>
+                }
             </div>
         )
     }

@@ -32,6 +32,10 @@ code {
     background-size: 1000px 100%;
 }
 
+.shimmerWrapper {
+    width: 0px;
+    animation: fullView 0.5s forwards linear;
+}
 .savedWeather{
     cursor: pointer;
 }
@@ -40,10 +44,6 @@ code {
     width: 30vw;
 }
 
-.shimmerWrapper {
-    width: 0px;
-    animation: fullView 0.5s forwards linear;
-}
 
 @keyframes shimmer {
     0% {
