@@ -140,7 +140,7 @@ const getQueryWeather = function (queryReq, type = 'summary', key) {
         query = `https://api.openweathermap.org/data/2.5/weather?q=${'new york'}&appid=${key}&units=metric`
     }
 
-    console.log(query)
+    // console.log(query)
 
     return new Promise((resolve, reject) => {
         let data = getAPIdata(encodeURI(query));

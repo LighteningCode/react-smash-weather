@@ -28,6 +28,7 @@ const vapidKeys = {
    privateKey: "aZwBYugrZ7PSXEaXEvYQ7dtH4sZk4dfukTX-ynZCKkg"
 }
 
+// client sends the subscription to the server and the server stores it
 app.post("/s/save", async (req, res, next) => {
    const subscription = req.body
    console.log(subscription)
@@ -35,6 +36,7 @@ app.post("/s/save", async (req, res, next) => {
    res.status(200).json({ msg: "success" })
 })
 
+// set up the VAPIDs
 webpush.setVapidDetails("mailto:myuserid@email.com", vapidKeys.publicKey, vapidKeys.privateKey)
 
 const sendNotification = (subscription, data) => {
@@ -46,6 +48,10 @@ app.get('/s/send', (req, res) => {
    const message = 'Hello World'
    sendNotification(subscription, message)
    res.json({ message: 'message sent' })
+})
+
+app.get('/api',(req, res, next)=>{
+   res.status(200).json({msg: "welcome"})
 })
 
 app.get('/*', (req, res) => {

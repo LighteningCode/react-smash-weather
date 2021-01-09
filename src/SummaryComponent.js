@@ -29,28 +29,8 @@ function check() {
 
 async function main() {
     const sw = await registerServiceWorker()
-
-    const options = {
-        userVisibleOnly: true,
-        applicationServerKey: "BOo8l8ft6TnM6ic8E2fm_BKz1fwqoF9pQEk-9Z7ZIJhDjSvmtBz9oOTgVuO-pFUbB-roAIzYHVQtztlpCWO1it4"
-    }
-
-    sw.pushManager.subscribe(options).then((pushSubscription) => {
-        console.log(pushSubscription.endpoint)
-        console.log(pushSubscription)
-        // now send this endpoint to a server
-        const endpoint = {endpoint: pushSubscription.endpoint}
-        axios.post("http://localhost:8080/s/save",endpoint).then(response=>{
-            console.log(response.data)
-        })
-
-    }, (error) => {
-        console.log(error)
-    })
 }
 
-check()
-main()
 
 function checkNotificationPromise() {
     try {
@@ -73,6 +53,11 @@ class SummaryComponent extends React.Component {
     }
 
     async componentDidMount() {
+
+        // when component mounts
+        check()
+        main()
+
         let weatherData;
         let savedWeather;
 
@@ -120,7 +105,7 @@ class SummaryComponent extends React.Component {
 
         if (localStorage.getItem('currentWeatherData')) {
             let currentWeatherData = JSON.parse(localStorage.getItem('currentWeatherData'));
-            console.log(currentWeatherData);
+            // console.log(currentWeatherData);
 
             await getQueryWeather(currentWeatherData, 'summary', API_KEY).then((data) => {
                 this.setState({
