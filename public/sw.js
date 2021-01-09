@@ -20,7 +20,7 @@ self.addEventListener('activate', async (e) => {
 
 const saveSubscription = async (subscription) => {
     const SERVER_URL = 'http://localhost:8080/s/save'
-    const response = await fetch(SERVER_URL,{
+    const response = await fetch(SERVER_URL, {
         method: 'post',
         headers: {
             'Content-Type': 'application/json'
@@ -32,27 +32,19 @@ const saveSubscription = async (subscription) => {
 }
 
 self.addEventListener('push', function (e) {
-    var options = {
-        body: 'This notification was generated from a push!',
-        icon: 'images/example.png',
-        vibrate: [100, 50, 100],
-        data: {
-            dateOfArrival: Date.now(),
-            primaryKey: '2'
-        },
-        actions: [
-            {
-                action: 'explore', title: 'Explore this new world',
-                icon: 'images/checkmark.png'
-            },
-            {
-                action: 'close', title: 'Close',
-                icon: 'images/xmark.png'
-            },
-        ]
-    };
 
-    e.waitUntil(
-        self.registration.showNotification('Hello world!', options)
-    );
+    if (e.data) {
+        console.log("Push event!!", e.data.text())
+        showLocalNotification("Hello", e.data.text(), self.registration)
+    } else {
+        console.log("No data")
+    }
 })
+
+
+const showLocalNotification = (title, body, swRegistration) => {
+    const options = {
+        ...body
+    }
+    swRegistration.showNotification(title, options)
+}
