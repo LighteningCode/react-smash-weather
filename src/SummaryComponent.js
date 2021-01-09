@@ -7,10 +7,50 @@ import {
 import Form from 'react-bootstrap/Form';
 import SavedWeatherCard from './SavedWeatherCard';
 import { store } from "react-notifications-component";
+import axios from "axios";
 
 
 const API_KEY = '5b240d5ca7b85efd188e3bcf200f8772';
 
+
+const registerServiceWorker = async () => {
+    const swRegistration = await navigator.serviceWorker.register('/sw.js'); //notice the file name
+    return swRegistration;
+}
+
+function check() {
+    if (!('serviceWorker' in navigator)) {
+        throw new Error('No Service Worker support!')
+    }
+    if (!('PushManager' in window)) {
+        throw new Error("No Push API Support")
+    }
+}
+
+async function main() {
+    const sw = await registerServiceWorker()
+
+    const options = {
+        userVisibleOnly: true,
+        applicationServerKey: "BOo8l8ft6TnM6ic8E2fm_BKz1fwqoF9pQEk-9Z7ZIJhDjSvmtBz9oOTgVuO-pFUbB-roAIzYHVQtztlpCWO1it4"
+    }
+
+    sw.pushManager.subscribe(options).then((pushSubscription) => {
+        console.log(pushSubscription.endpoint)
+        console.log(pushSubscription)
+        // now send this endpoint to a server
+        const endpoint = {endpoint: pushSubscription.endpoint}
+        axios.post("http://localhost:8080/s/save",endpoint).then(response=>{
+            console.log(response.data)
+        })
+
+    }, (error) => {
+        console.log(error)
+    })
+}
+
+check()
+main()
 
 function checkNotificationPromise() {
     try {
@@ -132,28 +172,28 @@ class SummaryComponent extends React.Component {
             console.log("This browser does not support notifications.")
         } else {
 
-            if(checkNotificationPromise()){
-                Notification.requestPermission().then(permission =>{
+            if (checkNotificationPromise()) {
+                Notification.requestPermission().then(permission => {
                     this.setState({
                         permission: permission
                     })
                 })
-            }else{
+            } else {
                 Notification.requestPermission((permission) => {
                     this.setState({
                         permission: permission
                     })
                 })
             }
-  
+
         }
     }
 
 
-    showNotification(){
+    showNotification() {
         let img = './weatherStates/weather-clear.png'
         let text = 'Hey, you have new weather here'
-        let notification = new Notification("Smash Weather", {body:text,image:img})
+        let notification = new Notification("Smash Weather", { body: text, image: img })
     }
 
     async saveWeatherData(e) {
@@ -292,7 +332,7 @@ class SummaryComponent extends React.Component {
                         }
                     </div>
                 </div>
-                <button onClick={this.requestPermission} className="btn btn-primary"> Request </button> <div>{this.state.permission}</div> 
+                <button onClick={this.requestPermission} className="btn btn-primary"> Request </button> <div>{this.state.permission}</div>
                 {
                     this.state.permission === 'granted' &&
                     <button onClick={this.showNotification} className="btn btn-warning">Start notification</button>
