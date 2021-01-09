@@ -172,7 +172,7 @@ class ForcastComponent extends React.Component {
           weatherData: data
         })
       }).catch((err) => {
-        console.log("Data not able to show");
+          console.log("Data not able to show");
         console.log(err);
       })
 

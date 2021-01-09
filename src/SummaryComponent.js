@@ -18,6 +18,37 @@ const registerServiceWorker = async () => {
     return swRegistration;
 }
 
+function updatePushService() {
+    navigator.serviceWorker.getRegistrations().then(data => {
+        const pushServiceWorkerSlug = 'sw.js'
+        data.forEach(serviceWorker => {
+            if (serviceWorker.active.scriptURL.includes(pushServiceWorkerSlug)) {
+                console.log("Service worker updated")
+                serviceWorker.update();
+            }
+        });
+    })
+}
+
+function removePushService(){
+    navigator.serviceWorker.getRegistrations().then(data => {
+        const pushServiceWorkerSlug = 'sw.js'
+        data.forEach(serviceWorker => {
+            if (serviceWorker.active.scriptURL.includes(pushServiceWorkerSlug)) {
+                serviceWorker.unregister().then(data => {
+                    console.log("successfully unregistered...")
+                    window.location.reload();
+                })
+            }
+        });
+    })
+
+}
+
+async function retryPushNotification() {
+    removePushService()
+}
+
 function check() {
     if (!('serviceWorker' in navigator)) {
         throw new Error('No Service Worker support!')
@@ -27,10 +58,28 @@ function check() {
     }
 }
 
-async function main() {
+async function checkNotificationPermission() {
+    const permission = await requestPermission()
+    if (permission !== 'granted') {
+        return false
+    } else {
+        return true
+    }
+}
+
+
+
+async function enablePushService() {
+    const permission = await requestPermission()
+    if (permission !== 'granted') {
+        console.log("Permission not granted")
+    }
     const sw = await registerServiceWorker()
 }
 
+function requestPermission() {
+    return window.Notification.requestPermission()
+}
 
 function checkNotificationPromise() {
     try {
@@ -48,18 +97,22 @@ class SummaryComponent extends React.Component {
     constructor(props) {
         super(props)
         this.state = { weatherData: null, inputState: '', savedWeatherData: [], dataHasLoaded: null, permission: 'Default' }
-        this.requestPermission = this.requestPermission.bind(this)
-        this.showNotification = this.showNotification.bind(this)
+        this.enablePushNotifications = this.enablePushNotifications.bind(this)
+        this.retryPushServiceWorker = this.retryPushServiceWorker.bind(this)
     }
 
     async componentDidMount() {
 
-        // when component mounts
-        check()
-        main()
-
         let weatherData;
         let savedWeather;
+
+        checkNotificationPermission().then(data => {
+            if (data === true) {
+                this.setState({ permission: "granted" })
+            } else {
+                this.setState({ permission: "denied" })
+            }
+        })
 
         if (localStorage.getItem('weatherData')) {
             let details;
@@ -152,33 +205,18 @@ class SummaryComponent extends React.Component {
         })
     }
 
-    requestPermission(e) {
-        if (!('Notification' in window)) {
-            console.log("This browser does not support notifications.")
-        } else {
-
-            if (checkNotificationPromise()) {
-                Notification.requestPermission().then(permission => {
-                    this.setState({
-                        permission: permission
-                    })
-                })
-            } else {
-                Notification.requestPermission((permission) => {
-                    this.setState({
-                        permission: permission
-                    })
-                })
-            }
-
-        }
+    enablePushNotifications() {
+        // when component mounts
+        check() // if there is push notification or service worker
+        enablePushService()
     }
 
 
-    showNotification() {
-        let img = './weatherStates/weather-clear.png'
-        let text = 'Hey, you have new weather here'
-        let notification = new Notification("Smash Weather", { body: text, image: img })
+    async retryPushServiceWorker() {
+        let notificationAllowed = await checkNotificationPermission()
+        if (notificationAllowed === false) {
+            retryPushNotification()
+        }
     }
 
     async saveWeatherData(e) {
@@ -317,10 +355,10 @@ class SummaryComponent extends React.Component {
                         }
                     </div>
                 </div>
-                <button onClick={this.requestPermission} className="btn btn-primary"> Request </button> <div>{this.state.permission}</div>
+                <button onClick={this.enablePushNotifications} className="btn btn-primary"> Enable push notifications </button> <div>{this.state.permission}</div>
                 {
-                    this.state.permission === 'granted' &&
-                    <button onClick={this.showNotification} className="btn btn-warning">Start notification</button>
+                    this.state.permission !== 'granted' &&
+                    <button onClick={this.retryPushServiceWorker} className="btn btn-warning">Clean Push Notification service</button>
                 }
             </div>
         )
